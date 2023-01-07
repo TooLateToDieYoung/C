@@ -13,15 +13,24 @@ Vector_t * Vector_Constructor(Point_t const * const begin, Point_t const * const
 {
   if(!begin || !end) return NULL;
 
+  return Vector_Constructor_Refs(&(Vector_refs_t){
+    .x = Point_get_Coordinate(end, PointX) - Point_get_Coordinate(begin, PointX),
+    .y = Point_get_Coordinate(end, PointY) - Point_get_Coordinate(begin, PointY),
+    .z = Point_get_Coordinate(end, PointZ) - Point_get_Coordinate(begin, PointZ)
+  });
+}
+
+Vector_t * Vector_Constructor_Refs(Vector_refs_t const * const refs)
+{
+  if(!refs) return NULL;
+
   Vector_t * const obj = (Vector_t*)malloc(sizeof(Vector_t));
 
   // Check if dynamic memory is successed.
   if(!obj) return NULL;
 
   // Initialize members
-  obj->x = Point_get_Coordinate(end, PointX) - Point_get_Coordinate(begin, PointX);
-  obj->y = Point_get_Coordinate(end, PointY) - Point_get_Coordinate(begin, PointY);
-  obj->z = Point_get_Coordinate(end, PointZ) - Point_get_Coordinate(begin, PointZ);
+  *obj = *(Vector_t*)refs;
 
   return obj;
 }
@@ -90,4 +99,10 @@ double Vector_PlaneAngle(Vector_t const * const self, Vector_Plane_Enum plane)
     case PlaneYZ: { return asin( self->x / Vector_Length(self) ); }
     default:      { return 0.0f; }
   }
+}
+
+// ? general member function
+Vector_refs_t Vector_Refs(Vector_t const * const self)
+{
+  return self ? (Vector_refs_t){ .x = self->x, .y = self->y, .z = self->z } : (Vector_refs_t){ 0 } ;
 }

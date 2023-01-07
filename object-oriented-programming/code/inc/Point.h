@@ -9,12 +9,19 @@ extern "C" {
 
 typedef enum { PointX, PointY, PointZ } Point_Coordinate_Enum;
 
+typedef struct {
+  double x;
+  double y;
+  double z;
+} Point_refs_t;
+
 typedef struct Point_t Point_t;
 
 // ? Constructor
 // 1. Create object body. (try to ask memorys)
 // 2. Initialize all members in the object.
 Point_t * Point_Constructor(double x, double y, double z);
+Point_t * Point_Constructor_Refs(Point_refs_t const * const refs);
 
 // ? Destructor
 // 1. Release object to avoid memory leaks.
@@ -34,6 +41,9 @@ task_t Point_set_Coordinate(Point_t * const self, Point_Coordinate_Enum coordina
 // 2. The only way to access the members in object.
 // 3. Don't try to ask multiple members in 1 call.
 double Point_get_Coordinate(Point_t const * const self, Point_Coordinate_Enum coordinate);
+
+// ? general member function
+Point_refs_t Point_Refs(Point_t const * const self);
 
 #ifdef __cplusplus
 }

@@ -10,15 +10,24 @@ struct Point_t {
 // ? Constructor
 Point_t * Point_Constructor(double x, double y, double z)
 {
+  return Point_Constructor_Refs(&(Point_refs_t){
+    .x = x,
+    .y = y,
+    .z = z
+  });
+}
+
+Point_t * Point_Constructor_Refs(Point_refs_t const * const refs)
+{
+  if(!refs) return NULL;
+
   Point_t * const obj = (Point_t*)malloc(sizeof(Point_t));
 
   // Check if dynamic memory is successed.
   if(!obj) return NULL;
 
   // Initialize members
-  obj->x = x;
-  obj->y = y;
-  obj->z = z;
+  *obj = *(Point_t*)refs;
 
   return obj;
 }
@@ -57,4 +66,10 @@ double Point_get_Coordinate(Point_t const * const self, Point_Coordinate_Enum co
     case PointZ:  { return self->z; }
     default:      { return 0.0f;    }
   }
+}
+
+// ? general member function
+Point_refs_t Point_Refs(Point_t const * const self)
+{
+  return self ? (Point_refs_t){ .x = self->x, .y = self->y, .z = self->z } : (Point_refs_t){ 0 } ;
 }

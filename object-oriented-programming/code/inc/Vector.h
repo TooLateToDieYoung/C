@@ -11,10 +11,17 @@ extern "C" {
 typedef enum { VectorX, VectorY, VectorZ } Vector_Coordinate_Enum;
 typedef enum { PlaneXY, PlaneXZ, PlaneYZ } Vector_Plane_Enum;
 
+typedef struct {
+  double x;
+  double y;
+  double z;
+} Vector_refs_t;
+
 typedef struct Vector_t Vector_t;
 
 // ? Constructor
 Vector_t * Vector_Constructor(Point_t const * const begin, Point_t const * const end);
+Vector_t * Vector_Constructor_Refs(Vector_refs_t const * const refs);
 
 // ? Destructor
 task_t Vector_Destructor(Vector_t * const self);
@@ -26,10 +33,10 @@ task_t Vector_set_Coordinate(Vector_t * const self, Vector_Coordinate_Enum coord
 double Vector_get_Coordinate(Vector_t const * const self, Vector_Coordinate_Enum coordinate);
 
 // ? general member functions
+Vector_refs_t Vector_Refs(Vector_t const * const self);
 double Vector_Length(Vector_t const * const self);
 double Vector_CoordinateAngle(Vector_t const * const self, Vector_Coordinate_Enum coordinate); // rad
 double Vector_PlaneAngle(Vector_t const * const self, Vector_Plane_Enum plane); // rad
-
 
 #ifdef __cplusplus
 }
