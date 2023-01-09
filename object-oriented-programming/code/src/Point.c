@@ -71,5 +71,5 @@ double Point_get_Coordinate(Point_t const * const self, Point_Coordinate_Enum co
 // ? general member function
 Point_refs_t Point_Refs(Point_t const * const self)
 {
-  return self ? (Point_refs_t){ .x = self->x, .y = self->y, .z = self->z } : (Point_refs_t){ 0 } ;
+  return self ? *(Point_refs_t*)self : (Point_refs_t){ 0 } ;
 }

@@ -12,11 +12,14 @@ struct Vector_t {
 Vector_t * Vector_Constructor(Point_t const * const begin, Point_t const * const end)
 {
   if(!begin || !end) return NULL;
+  
+  const Point_refs_t B = Point_Refs(begin);
+  const Point_refs_t E = Point_Refs(end);
 
   return Vector_Constructor_Refs(&(Vector_refs_t){
-    .x = Point_get_Coordinate(end, PointX) - Point_get_Coordinate(begin, PointX),
-    .y = Point_get_Coordinate(end, PointY) - Point_get_Coordinate(begin, PointY),
-    .z = Point_get_Coordinate(end, PointZ) - Point_get_Coordinate(begin, PointZ)
+    .x = E.x - B.x,
+    .y = E.y - B.y,
+    .z = E.z - B.z
   });
 }
 
@@ -104,5 +107,5 @@ double Vector_PlaneAngle(Vector_t const * const self, Vector_Plane_Enum plane)
 // ? general member function
 Vector_refs_t Vector_Refs(Vector_t const * const self)
 {
-  return self ? (Vector_refs_t){ .x = self->x, .y = self->y, .z = self->z } : (Vector_refs_t){ 0 } ;
+  return self ? *(Vector_refs_t*)(self) : (Vector_refs_t){ 0 } ;
 }
