@@ -33,7 +33,7 @@ static node_t * _Node_FarL(node_t * const self);
 static task_t _Node_Insert(node_t * const self, node_t * const add, CompareFunction cmp);
 
 // * Tree_Remove
-static task_t _Node_Sink(node_t * const self, CompareFunction cmp);
+static task_t _Node_Sink(node_t * const self);
 static task_t _Node_Remove(node_t * const self, void * const item, CompareFunction cmp);
 
 // * Tree_isContain
@@ -164,11 +164,12 @@ task_t Tree_Insert(tree_t * const self, void * const item)
 }
 
 /* Remove */
-static task_t _Node_Sink(node_t * const self, CompareFunction cmp)
+static task_t _Node_Sink(node_t * const self)
 {
   if(!self->L && !self->R) {
     if(self->P->L == self) self->P->L = NULL;
     else                   self->P->R = NULL;
+    _Node_Destructor(self);
     return Success;
   }
 
@@ -176,7 +177,7 @@ static task_t _Node_Sink(node_t * const self, CompareFunction cmp)
 
   self->item = far->item;
 
-  return _Node_Remove(far, far->item, cmp);
+  return _Node_Sink(far);
 }
 
 static task_t _Node_Remove(node_t * const self, void * const item, CompareFunction cmp)
@@ -184,7 +185,7 @@ static task_t _Node_Remove(node_t * const self, void * const item, CompareFuncti
   switch (cmp(self->item, item)) {
     case -1: return _Node_Remove(self->L, item, cmp);
     case +1: return _Node_Remove(self->R, item, cmp);
-    case  0: return _Node_Sink(self, cmp);
+    case  0: return _Node_Sink(self);
     default: return Fail;
   }
 }
@@ -199,8 +200,7 @@ task_t Tree_Remove(tree_t * const self, void * const item)
     return _Node_Remove(self->root, item, self->cmp);
   
   // ? Make sure that root has leaves
-  if(self->root->L || self->root->R) 
-    return _Node_Sink(self->root, self->cmp);
+  if(self->root->L || self->root->R) return _Node_Sink(self->root);
 
   // ? The last case: is the root and the root does not have any leaves
   _Node_Destructor(self->root);
