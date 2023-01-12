@@ -1,8 +1,6 @@
 #include "tree.h"
 #include <stdlib.h>
 
-typedef enum { NodeR, NodeB } color_t;
-
 typedef struct node_t node_t;
 
 struct node_t {
@@ -10,13 +8,83 @@ struct node_t {
   node_t * P;
   node_t * L;
   node_t * R;
-  color_t color;
+  bool_t isRed;
 };
 
 struct tree_t {
   node_t * root;
   CompareFunction cmp;
 };
+
+static node_t * _Node_RotateL(node_t * const self)
+{
+  // Take self->P as node a: [a->P, a->L, a->R] ~> [a->R, a->L, b->L]
+  // Take self    as node b: [b->P, b->L, b->R] ~> [a->P, b->P, b->R]
+  // , where ( a->R is b ) and ( b->P is a )
+  node_t * const temp = self->P;
+  temp->R = self->L;
+  self->P = temp->P;
+  temp->P = self;
+  self->L = temp;
+  if(temp->R) temp->R->P = temp;
+//self->L->P = self;
+
+  return self;
+}
+static node_t * _Node_RotateR(node_t * const self)
+{
+  // Take self->P as node a: [a->P, a->L, a->R] ~> [a->L, b->R, a->R]
+  // Take self    as node b: [b->P, b->L, b->R] ~> [a->P, b->L, b->P]
+  // , where ( a->L is b ) and ( b->P is a )
+  node_t * const temp = self->P;
+  temp->L = self->R;
+  self->P = temp->P;
+  temp->P = self;
+  self->R = temp;
+  if(temp->L) temp->L->P = temp;
+//self->R->P = self;
+  
+  return self;
+}
+static node_t * _Node_BackRoot(node_t * const self)
+{
+  return self->P ? _Node_BackRoot(self->P) : self ;
+}
+static node_t * _Node_Adjust(node_t * const self)
+{
+  if(!self->P) return self; // is root
+  if(!self->P->isRed) return _Node_BackRoot(self); // is okay
+
+  node_t * const GP = self->P->P;
+
+  if(GP->L == self->P) {
+    if(GP->R && GP->R->isRed) goto __PR_and_UR; // PR && UR
+    if(self->P->R == self) GP->L = _Node_RotateL(self); // PR && !UR && self is R
+    GP->L->isRed = False;
+    GP->isRed    = True;
+    if(!GP->P) return GP; // is root
+    if(GP->P->L == GP) GP->P->L = _Node_RotateR(GP->L);
+    else               GP->P->R = _Node_RotateR(GP->L);
+    return _Node_Adjust(GP->P);
+  }
+
+  if(GP->R == self->P) {
+    if(GP->L && GP->L->isRed) goto __PR_and_UR; // PR && UR
+    if(self->P->L == self) GP->R = _Node_RotateR(self); // PR && !UR && self is L
+    GP->R->isRed = False;
+    GP->isRed    = True;
+    if(!GP->P) return GP; // is root
+    if(GP->P->L == GP) GP->P->L = _Node_RotateL(GP->R);
+    else               GP->P->R = _Node_RotateL(GP->R);
+    return _Node_Adjust(GP->P);
+  }
+
+__PR_and_UR:
+  GP->L->isRed = False;
+  GP->R->isRed = False;
+  GP->isRed = True;
+  return _Node_Adjust(GP);
+}
 
 static node_t * _Node_Constructor(void * const item)
 {
@@ -25,7 +93,7 @@ static node_t * _Node_Constructor(void * const item)
   if(!obj) return NULL;
 
   obj->item  = item;
-  obj->color = NodeR; // ? default value
+  obj->isRed = True; // ? default value
   
   return obj;
 }
@@ -80,12 +148,6 @@ void * Tree_FarL(tree_t const * const self)
   return self && self->root ? _Node_FarL(self->root)->item : NULL ;
 }
 
-static node_t * _Node_Adjust(node_t * const self)
-{
-  // TODO: red-black tree check & rotate.
-
-  return self->P ? _Node_Adjust(self->P) : self ;
-}
 static node_t * _Node_Insert(node_t * const self, node_t * const add, CompareFunction cmp)
 {
   switch (cmp(self->item, add->item)) {
@@ -118,6 +180,7 @@ task_t Tree_Insert(tree_t * const self, void * const item)
   if(!node) return Fail;
 
   self->root = Tree_isEmpty(self) ? node : _Node_Insert(self->root, node, self->cmp);
+  self->root->isRed = False;
 
   return Success;
 }
@@ -139,7 +202,7 @@ static node_t * _Node_Sink(node_t * const self)
   if(temp->L == self) temp->L = NULL;
   else                temp->R = NULL;
   free(self);
-  return _Node_Adjust(temp);
+  return _Node_BackRoot(temp);
 }
 static node_t * _Node_Remove(node_t * const self, void * const item, CompareFunction cmp)
 {
