@@ -202,7 +202,7 @@ static node_t * _Node_Sink(node_t * const self)
   if(temp->L == self) temp->L = NULL;
   else                temp->R = NULL;
   free(self);
-  return _Node_BackRoot(temp);
+  return _Node_Adjust(temp);
 }
 static node_t * _Node_Remove(node_t * const self, void * const item, CompareFunction cmp)
 {
