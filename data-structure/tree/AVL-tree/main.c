@@ -12,7 +12,7 @@ static char compare(void const * const a, void const * const b)
 
 int main(void)
 {
-  char data[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // "WEFGA672KCD4J08RZSTUHI1LMO53PQ9NVXYB";
+  char data[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   const size_t len = strlen(data);
 
   tree_t * const tree = Tree_Constructor(compare);
