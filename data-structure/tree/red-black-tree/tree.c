@@ -18,12 +18,6 @@ struct tree_t {
   CompareFunction cmp;
 };
 
-// ? reserved for balanced tree use
-static node_t * _Node_Adjust(node_t * const self)
-{
-  return self->P ? _Node_Adjust(self->P) : self ;
-}
-
 static node_t * _Node_Constructor(void * const item)
 {
   node_t * const obj = (node_t*)calloc(1, sizeof(node_t));
@@ -86,6 +80,12 @@ void * Tree_FarL(tree_t const * const self)
   return self && self->root ? _Node_FarL(self->root)->item : NULL ;
 }
 
+static node_t * _Node_Adjust(node_t * const self)
+{
+  // TODO: red-black tree check & rotate.
+
+  return self->P ? _Node_Adjust(self->P) : self ;
+}
 static node_t * _Node_Insert(node_t * const self, node_t * const add, CompareFunction cmp)
 {
   switch (cmp(self->item, add->item)) {
