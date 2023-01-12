@@ -1,8 +1,6 @@
 #include "tree.h"
 #include <stdlib.h>
 
-typedef enum { NodeR, NodeB } color_t;
-
 typedef struct node_t node_t;
 
 struct node_t {
@@ -10,7 +8,6 @@ struct node_t {
   node_t * P;
   node_t * L;
   node_t * R;
-  color_t color;
 };
 
 struct tree_t {
@@ -30,8 +27,7 @@ static node_t * _Node_Constructor(void * const item)
 
   if(!obj) return NULL;
 
-  obj->item  = item;
-  obj->color = NodeR; // ? default value
+  obj->item = item;
   
   return obj;
 }
