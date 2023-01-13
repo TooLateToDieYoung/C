@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include "stack.h"
 
-struct stack_t
-{
+struct stack_t {
   size_t max;
   size_t top;
   void ** array;
@@ -15,7 +14,7 @@ stack_t * Stack_Constructor(const size_t maxSize)
   if(!obj) return NULL;
 
   obj->max = maxSize;
-  obj->array = (void*)calloc(obj->max, sizeof(void*));
+  obj->array = (void**)calloc(obj->max, sizeof(void*));
 
   if(!obj->array) {
     Stack_Destructor(obj);
