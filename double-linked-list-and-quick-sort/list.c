@@ -140,8 +140,8 @@ static void _Node_QuickSort(node_t * const head, node_t * const tail, CompareFun
 
   if(head != Pptr) _Node_Swap(head, Pptr);
 
-  _Node_QuickSort(head,    Pptr, cmp);
-  _Node_QuickSort(Pptr->N, tail, cmp);
+  _Node_QuickSort(head, Pptr, cmp);
+  _Node_QuickSort(Nptr, tail, cmp);
 }
 
 list_t * List_QuickSort(list_t * const self, CompareFunction cmp)
