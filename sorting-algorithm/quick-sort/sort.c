@@ -11,22 +11,18 @@ char * Sort(char array[], size_t len, CompareFunction cmp)
 {
   if(len < 2) return array;
 
-  const char index = array[0];
-
-  size_t c = 1;
-  size_t h = 0;
+  size_t h = 1;
   size_t t = len - 1;
 
-  while( h < t ) {
-    switch (cmp(index, array[c])) {
-      case -1: _Swap(&array[t--], &array[c]);   continue;
-      case +1: _Swap(&array[h++], &array[c++]); continue;
-      default: continue;
-    }
+  while( h != t + 1 ) {
+    if( cmp(array[0], array[t]) == -1 ) --t;
+    else _Swap(&array[h++], &array[t]);
   }
 
-  Sort(&array[0],       c, cmp);
-  Sort(&array[c], len - c, cmp);
+  if(t) _Swap(&array[0], &array[t]);
+
+  Sort(&array[0],       t, cmp);
+  Sort(&array[h], len - h, cmp);
 
   return array;
 }
